@@ -1,0 +1,254 @@
+---
+import Base from "../layouts/Base.astro";
+import { getCollection, render } from "astro:content";
+import {
+  profile,
+  stack,
+  roles,
+  credentials,
+  education,
+  languages,
+} from "../data/site";
+
+const entries = (await getCollection("projects")).sort(
+  (a, b) => a.data.order - b.data.order
+);
+const projects = await Promise.all(
+  entries.map(async (entry) => ({
+    ...entry.data,
+    Content: (await render(entry)).Content,
+  }))
+);
+
+// Career axis geometry. Span runs 2016 -> now; x is linear in years.
+const AXIS = { x0: 10, x1: 990, from: 2016, to: 2026.75 };
+const x = (year: number) =>
+  AXIS.x0 + ((year - AXIS.from) / (AXIS.to - AXIS.from)) * (AXIS.x1 - AXIS.x0);
+const pct = (year: number) => (x(year) / 1000) * 100;
+
+const majorTicks = [
+  { year: 2016, label: "2016", align: "start" },
+  { year: 2019, label: "2019", align: "mid" },
+  { year: 2021, label: "2021", align: "mid" },
+  { year: 2023.67, label: "2023", align: "mid" },
+  { year: AXIS.to, label: "now", align: "end" },
+];
+const minorTicks = [2017, 2018, 2020, 2022, 2024, 2025];
+
+// Each role is a segment on the line, so the axis shows the shape of the
+// career rather than decorating the hero.
+const segments = roles.map((role) => ({
+  label: `${role.company}, ${role.period}`,
+  x1: x(role.from),
+  x2: x(role.to),
+  current: role.end === null,
+}));
+
+// Labels are HTML, not SVG <text>: SVG text scales with the viewBox and would
+// shrink to a few pixels on a phone.
+const shift = { start: "none", mid: "translateX(-50%)", end: "translateX(-100%)" };
+---
+
+<Base
+  title={`${profile.name} — ${profile.role}`}
+  description="Backend engineer in the Netherlands working in PHP and Symfony on SaaS and logistics platforms. PSM II certified Scrum Master."
+>
+  <div class="shell">
+    <header class="masthead">
+      <span class="masthead__name">{profile.name}</span>
+      <nav class="masthead__nav" aria-label="Sections">
+        <a href="#stack">Stack</a>
+        <a href="#work">Work</a>
+        <a href="#selected">Selected work</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero">
+        <p class="hero__role">{profile.role}, {profile.location}</p>
+        <h1 class="hero__statement">{profile.statement}</h1>
+        <div class="axis" role="img" aria-label="Career timeline running from 2016 to the present, with the current role beginning in 2023.">
+          <svg class="axis__svg" viewBox="0 0 1000 60" preserveAspectRatio="none" aria-hidden="true">
+            <line class="axis__rule" x1={AXIS.x0} y1="30" x2={AXIS.x1} y2="30" />
+            {minorTicks.map((y) => (
+              <line class="axis__tick" x1={x(y)} y1="26" x2={x(y)} y2="34" />
+            ))}
+            {majorTicks.map((t) => (
+              <line class="axis__tick" x1={x(t.year)} y1="20" x2={x(t.year)} y2="40" />
+            ))}
+            {segments.map((seg) => (
+              <line
+                class:list={["axis__seg", { "axis__seg--current": seg.current }]}
+                x1={seg.x1}
+                y1="30"
+                x2={seg.x2}
+                y2="30"
+              >
+                <title>{seg.label}</title>
+              </line>
+            ))}
+          </svg>
+          <div class="axis__labels" aria-hidden="true">
+            {majorTicks.map((t) => (
+              <span
+                class:list={[
+                  "axis__label",
+                  { "axis__label--mid": t.align === "mid" },
+                  { "axis__label--now": t.label === "now" },
+                ]}
+                style={`left:${pct(t.year)}%;transform:${shift[t.align as keyof typeof shift]}`}
+              >
+                {t.label}
+              </span>
+            ))}
+          </div>
+          <p class="axis__caption">Ten years, five teams, the last six in the Netherlands.</p>
+        </div>
+      </section>
+
+      <section class="band" id="about">
+        <div class="band__grid">
+          <h2 class="band__label">About</h2>
+          <div>
+            {profile.intro.map((para) => <p>{para}</p>)}
+          </div>
+        </div>
+      </section>
+
+      <section class="band" id="stack">
+        <div class="band__grid">
+          <h2 class="band__label">Stack</h2>
+          <div class="stack">
+            {stack.map((row) => (
+              <div class="stack__row">
+                <span class="stack__layer">{row.layer}</span>
+                <span class="stack__items">{row.items.join(", ")}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section class="band" id="work">
+        <div class="band__grid">
+          <h2 class="band__label">Work</h2>
+          <div class="work">
+            {roles.map((role) => (
+              <article class:list={["role", { "role--current": role.end === null }]}>
+                <div class="role__head">
+                  <h3 class="role__company">{role.company}</h3>
+                  <span class="role__period">{role.period}</span>
+                </div>
+                <p class="role__title">{role.title}, {role.place}</p>
+                <p class="role__summary">{role.summary}</p>
+                <ul class="role__points">
+                  {role.points.map((point) => <li>{point}</li>)}
+                </ul>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section class="band" id="selected">
+        <div class="band__grid">
+          <h2 class="band__label">Selected work</h2>
+          <div class="notes">
+            {projects.map((project) => (
+              <article class="note">
+                <div>
+                  <h3 class="note__title">{project.title}</h3>
+                  <p class="note__context">{project.context}</p>
+                  <div class="note__tags">
+                    {project.tags.map((tag) => <span>{tag}</span>)}
+                  </div>
+                </div>
+                <div class="note__body">
+                  <project.Content />
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section class="band" id="credentials">
+        <div class="band__grid">
+          <h2 class="band__label">Certification</h2>
+          <div>
+            {credentials.map((cred) => (
+              <div class="cred">
+                <h3 class="cred__title">{cred.title}</h3>
+                <p class="cred__issuer">{cred.issuer}</p>
+                <p class="cred__note">{cred.note}</p>
+                {cred.url && (
+                  <a class="cred__link" href={cred.url} rel="noopener">
+                    Verify this credential
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section class="band" id="education">
+        <div class="band__grid">
+          <h2 class="band__label">Education</h2>
+          <div>
+            {education.map((item) => (
+              <div class="school">
+                <span class="school__title">{item.title}</span>
+                <span class="school__period">{item.period}</span>
+                <span class="school__where">{item.school}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="contact" id="contact">
+      <h2 class="contact__lead">Open to backend roles in the Netherlands.</h2>
+      <div class="contact__list">
+        <div class="contact__item">
+          <span class="contact__key">Email</span>
+          <span class="contact__value">
+            <a href={`mailto:${profile.email}`}>{profile.email}</a>
+          </span>
+        </div>
+        <div class="contact__item">
+          <span class="contact__key">LinkedIn</span>
+          <span class="contact__value">
+            <a href={profile.linkedin} rel="noopener">linkedin.com/in/naderghanem</a>
+          </span>
+        </div>
+        {profile.github && (
+          <div class="contact__item">
+            <span class="contact__key">GitHub</span>
+            <span class="contact__value">
+              <a href={profile.github} rel="noopener">
+                {profile.github.replace("https://github.com/", "github.com/")}
+              </a>
+            </span>
+          </div>
+        )}
+        <div class="contact__item">
+          <span class="contact__key">Based in</span>
+          <span class="contact__value">{profile.location}</span>
+        </div>
+        <div class="contact__item">
+          <span class="contact__key">Languages</span>
+          <span class="contact__value">{languages.join(", ")}</span>
+        </div>
+      </div>
+    </footer>
+
+    <div class="colophon">
+      <span>{profile.name}</span>
+      <span>Built with Astro</span>
+    </div>
+  </div>
+</Base>

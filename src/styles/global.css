@@ -1,0 +1,686 @@
+/* ---------------------------------------------------------------
+   Tokens
+   Palette: cool drafting grey + deep slate-teal ink + petrol accent
+   (the "healthy" green of a status dashboard).
+   --------------------------------------------------------------- */
+:root {
+  --paper: #eef0ee;
+  --paper-raised: #f6f7f6;
+  --ink: #1b2b2a;
+  --ink-soft: #52635f;
+  --ink-faint: #8a9995;
+  --rule: #d2d9d6;
+  --rule-strong: #b9c3bf;
+  --accent: #0b6e5f;
+  --accent-soft: #dfebe7;
+
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* Perfect-fourth-ish scale */
+  --t-xs: 0.8125rem;
+  --t-sm: 0.9375rem;
+  --t-base: 1.0625rem;
+  --t-md: 1.25rem;
+  --t-lg: 1.6875rem;
+  --t-xl: 2.25rem;
+
+  --gutter: 1.5rem;
+  --measure: 66ch;
+  --label-col: 9.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #121a19;
+    --paper-raised: #17211f;
+    --ink: #e4eae7;
+    --ink-soft: #9aa9a5;
+    --ink-faint: #6b7c78;
+    --rule: #26332f;
+    --rule-strong: #35443f;
+    --accent: #4fbfa8;
+    --accent-soft: #16302b;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Base
+   --------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 0;
+}
+
+p {
+  margin: 0 0 1em;
+  max-width: var(--measure);
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.shell {
+  width: 100%;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.6rem 1rem;
+  z-index: 10;
+}
+
+.skip:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+}
+
+/* ---------------------------------------------------------------
+   Masthead
+   --------------------------------------------------------------- */
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 2rem 0 0;
+}
+
+.masthead__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-base);
+  letter-spacing: -0.01em;
+}
+
+.masthead__nav {
+  display: flex;
+  gap: 1.5rem;
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+}
+
+.masthead__nav a {
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+.masthead__nav a:hover {
+  color: var(--ink);
+  border-bottom-color: var(--rule-strong);
+}
+
+/* ---------------------------------------------------------------
+   Hero — the one bold element: a measured time axis
+   --------------------------------------------------------------- */
+.hero {
+  padding: clamp(3.5rem, 11vw, 7.5rem) 0 clamp(2.5rem, 6vw, 4rem);
+}
+
+.hero__role {
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  color: var(--accent);
+  letter-spacing: 0.01em;
+  margin: 0 0 1.75rem;
+}
+
+.hero__statement {
+  font-size: clamp(1.75rem, 4.6vw, 3.15rem);
+  line-height: 1.1;
+  max-width: 20ch;
+  margin: 0;
+  text-wrap: balance;
+}
+
+/* Career axis */
+.axis {
+  margin-top: clamp(2.75rem, 7vw, 4.5rem);
+}
+
+/* Fixed height + preserveAspectRatio="none": the rule stretches to any width
+   while strokes keep their real thickness and labels below stay readable. */
+.axis__svg {
+  display: block;
+  width: 100%;
+  height: 52px;
+}
+
+.axis__rule,
+.axis__tick {
+  stroke: var(--rule-strong);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+/* One segment per role. Reading the line tells you the shape of the career:
+   short early stints, then two long ones. */
+.axis__seg {
+  stroke: var(--ink);
+  stroke-width: 5;
+  vector-effect: non-scaling-stroke;
+}
+
+.axis__seg--current {
+  stroke: var(--accent);
+}
+
+.axis__labels {
+  position: relative;
+  height: 1.2rem;
+  margin-top: 0.5rem;
+}
+
+.axis__label {
+  position: absolute;
+  top: 0;
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  line-height: 1;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+.axis__label--now {
+  color: var(--accent);
+}
+
+/* Five year marks do not fit on a phone; keep the two that carry the span. */
+@media (max-width: 34rem) {
+  .axis__label--mid {
+    display: none;
+  }
+}
+
+.axis__caption {
+  margin-top: 1rem;
+  font-size: var(--t-xs);
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+}
+
+/* The one orchestrated moment on the page: the axis measures itself out, once.
+   Kept under a second so the hero is never blank for long. */
+@media (prefers-reduced-motion: no-preference) {
+  .axis__rule {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: draw 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+  }
+  .axis__seg {
+    opacity: 0;
+    animation: fade 0.45s ease 0.5s forwards;
+  }
+  .axis__tick,
+  .axis__labels,
+  .axis__caption {
+    opacity: 0;
+    animation: fade 0.4s ease 0.6s forwards;
+  }
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fade {
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Sections — narrow label gutter, wide content column
+   --------------------------------------------------------------- */
+.band {
+  border-top: 1px solid var(--rule);
+  padding: clamp(2.75rem, 6vw, 4.5rem) 0;
+}
+
+.band__grid {
+  display: grid;
+  grid-template-columns: var(--label-col) minmax(0, 1fr);
+  gap: 2rem 3rem;
+  align-items: start;
+}
+
+.band__label {
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--ink-faint);
+  font-family: var(--font-display);
+  letter-spacing: 0;
+  position: sticky;
+  top: 2rem;
+}
+
+@media (max-width: 52rem) {
+  .band__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+  .band__label {
+    position: static;
+    color: var(--accent);
+  }
+}
+
+/* ---------------------------------------------------------------
+   Stack table
+   --------------------------------------------------------------- */
+.stack {
+  display: grid;
+  gap: 0;
+}
+
+.stack__row {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: 0.35rem 1.5rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+}
+
+.stack__row:first-child {
+  padding-top: 0;
+}
+
+.stack__row:last-child {
+  border-bottom: 0;
+}
+
+.stack__layer {
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+}
+
+.stack__items {
+  font-size: var(--t-sm);
+  font-family: var(--font-mono);
+  color: var(--ink);
+  line-height: 1.7;
+}
+
+@media (max-width: 34rem) {
+  .stack__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------------------------------------------------------------
+   Work timeline
+   --------------------------------------------------------------- */
+.work {
+  display: grid;
+  gap: 0;
+}
+
+.role {
+  position: relative;
+  padding: 0 0 2.5rem 1.75rem;
+  border-left: 1px solid var(--rule);
+}
+
+.role:last-child {
+  padding-bottom: 0;
+  border-left-color: transparent;
+}
+
+.role::before {
+  content: "";
+  position: absolute;
+  left: -4.5px;
+  top: 0.55rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1px solid var(--rule-strong);
+}
+
+.role--current::before {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.role__head {
+  max-width: var(--measure);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.role__company {
+  font-family: var(--font-display);
+  font-size: var(--t-md);
+  font-weight: 500;
+}
+
+.role__period {
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+.role__title {
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+  margin: 0.15rem 0 0;
+}
+
+.role__summary {
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+  margin: 0.85rem 0 0;
+  max-width: var(--measure);
+}
+
+.role__points {
+  margin: 0.85rem 0 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.role__points li {
+  position: relative;
+  padding-left: 1.1rem;
+  font-size: var(--t-sm);
+  max-width: var(--measure);
+}
+
+.role__points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 6px;
+  height: 1px;
+  background: var(--rule-strong);
+}
+
+/* ---------------------------------------------------------------
+   Selected work — engineering notes, not cards
+   --------------------------------------------------------------- */
+.notes {
+  display: grid;
+  gap: 0;
+}
+
+.note {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+  gap: 1.25rem 2.5rem;
+  padding: 1.75rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.note:first-child {
+  padding-top: 0;
+}
+
+.note:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.note__title {
+  font-family: var(--font-display);
+  font-size: var(--t-md);
+  font-weight: 500;
+  margin: 0 0 0.5rem;
+}
+
+.note__context {
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  color: var(--ink-faint);
+  margin: 0;
+}
+
+.note__body {
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+}
+
+.note__body p {
+  margin-bottom: 0.75em;
+}
+
+.note__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.75rem;
+  margin-top: 0.9rem;
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  color: var(--accent);
+}
+
+@media (max-width: 46rem) {
+  .note {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Credentials + education
+   --------------------------------------------------------------- */
+.cred {
+  border-left: 2px solid var(--accent);
+  padding: 0.1rem 0 0.1rem 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.cred:last-child {
+  margin-bottom: 0;
+}
+
+.cred__title {
+  font-family: var(--font-display);
+  font-size: var(--t-md);
+  font-weight: 500;
+  margin: 0;
+}
+
+.cred__issuer {
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  color: var(--ink-faint);
+  margin: 0.25rem 0 0;
+}
+
+.cred__note {
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+  margin: 0.65rem 0 0;
+  max-width: var(--measure);
+}
+
+.cred__link {
+  display: inline-block;
+  margin-top: 0.6rem;
+  font-size: var(--t-sm);
+  color: var(--accent);
+  border-bottom: 1px solid currentColor;
+}
+
+.school {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.25rem 1.5rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+}
+
+.school:last-child {
+  border-bottom: 0;
+}
+
+.school__title {
+  font-size: var(--t-sm);
+  font-weight: 500;
+}
+
+.school__where {
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+  grid-column: 1;
+}
+
+.school__period {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------
+   Contact
+   --------------------------------------------------------------- */
+.contact {
+  border-top: 1px solid var(--rule);
+  padding: clamp(3rem, 8vw, 5.5rem) 0 clamp(2.5rem, 5vw, 4rem);
+}
+
+.contact__lead {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3.4vw, 2.25rem);
+  font-weight: 500;
+  line-height: 1.15;
+  max-width: 18ch;
+  margin: 0 0 2rem;
+}
+
+.contact__list {
+  display: grid;
+  gap: 0;
+  max-width: 34rem;
+}
+
+.contact__item {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr);
+  gap: 1.5rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--rule);
+  align-items: baseline;
+}
+
+.contact__key {
+  font-size: var(--t-xs);
+  font-family: var(--font-mono);
+  color: var(--ink-faint);
+}
+
+.contact__value {
+  font-size: var(--t-sm);
+  word-break: break-word;
+}
+
+.contact__value a {
+  border-bottom: 1px solid var(--rule-strong);
+  padding-bottom: 1px;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+.contact__value a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+@media (max-width: 34rem) {
+  .contact__item {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.2rem;
+  }
+}
+
+.colophon {
+  border-top: 1px solid var(--rule);
+  padding: 1.5rem 0 3rem;
+  font-size: var(--t-xs);
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  justify-content: space-between;
+}
