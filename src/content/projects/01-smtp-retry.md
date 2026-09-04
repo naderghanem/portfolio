@@ -5,12 +5,12 @@ order: 1
 tags: ["Symfony Messenger", "SMTP", "PHP"]
 ---
 
-A queue-backed mailer was retrying every failed send the same way. A mailbox that
-no longer exists fails identically to a mail server having a bad minute, so
-permanent failures cycled through the whole retry schedule and buried real
-incidents in alert noise.
+A mailbox that no longer exists and a mail server having a bad minute fail the
+same way at the transport level. Treat them identically and permanent rejections
+ride the whole backoff schedule, taking up room that belongs to the transient
+failures retrying would actually fix.
 
-I designed a retry strategy that reads the SMTP response and separates permanent
-rejections from transient ones. Permanent failures stop immediately and get
-recorded; transient ones back off and try again. Queue volume and false alerts
-both came down.
+I design queue retry strategies that read the SMTP response and split the two:
+permanent rejections stop on the first attempt and get recorded, transient ones
+back off and try again. Little code, and it decides whether a retry queue is
+reporting problems worth acting on or just talking to itself.

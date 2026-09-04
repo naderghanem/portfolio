@@ -1,9 +1,30 @@
 /* ---------------------------------------------------------------
+   Block Craft Medium — self-hosted, it is on no font CDN.
+   The file ships one weight. Declaring the 400-700 range against it
+   claims that whole span, so the browser reaches for this face instead
+   of smearing a synthetic bold over a blocky display face.
+   --------------------------------------------------------------- */
+@font-face {
+  font-family: "Block Craft";
+  src: url("/fonts/block-craft-medium.otf") format("opentype");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------------------------------------------------------------
    Tokens
    Palette: cool drafting grey + deep slate-teal ink + petrol accent
    (the "healthy" green of a status dashboard).
+
+   Theming: light values live on :root. The dark set is written twice —
+   once for the system preference, once for an explicit data-theme="dark"
+   — so the toggle wins in both directions and the page still follows the
+   OS when JavaScript is off.
    --------------------------------------------------------------- */
 :root {
+  color-scheme: light;
+
   --paper: #eef0ee;
   --paper-raised: #f6f7f6;
   --ink: #1b2b2a;
@@ -14,7 +35,16 @@
   --accent: #0b6e5f;
   --accent-soft: #dfebe7;
 
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  /* The waterfall is page background, not a screen, so it is tinted with the
+     page accent and kept far back. No glow in light: it would read as blur. */
+  --rain-dim: rgba(11, 110, 95, 0.15);
+  --rain-lit: rgba(11, 110, 95, 0.32);
+  --rain-glow: none;
+
+  /* Pixelify Sans carries the headings; Press Start 2P is rationed out to
+     section labels and the theme switch, where a word or two stays legible. */
+  --font-display: "Block Craft", "Pixelify Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-pixel: "Press Start 2P", "Pixelify Sans", ui-monospace, monospace;
   --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
 
@@ -32,7 +62,9 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
     --paper: #121a19;
     --paper-raised: #17211f;
     --ink: #e4eae7;
@@ -42,7 +74,29 @@
     --rule-strong: #35443f;
     --accent: #4fbfa8;
     --accent-soft: #16302b;
+
+    --rain-dim: rgba(53, 245, 138, 0.12);
+    --rain-lit: rgba(53, 245, 138, 0.3);
+    --rain-glow: 0 0 8px rgba(53, 245, 138, 0.28);
   }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --paper: #121a19;
+  --paper-raised: #17211f;
+  --ink: #e4eae7;
+  --ink-soft: #9aa9a5;
+  --ink-faint: #6b7c78;
+  --rule: #26332f;
+  --rule-strong: #35443f;
+  --accent: #4fbfa8;
+  --accent-soft: #16302b;
+
+  --rain-dim: rgba(53, 245, 138, 0.12);
+  --rain-lit: rgba(53, 245, 138, 0.3);
+  --rain-glow: 0 0 8px rgba(53, 245, 138, 0.28);
 }
 
 /* ---------------------------------------------------------------
@@ -88,8 +142,8 @@ h2,
 h3 {
   font-family: var(--font-display);
   font-weight: 500;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  letter-spacing: 0;
+  line-height: 1.22;
   margin: 0;
 }
 
@@ -148,21 +202,33 @@ ul {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem 2rem;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   padding: 2rem 0 0;
 }
 
+.masthead__end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.75rem;
+}
+
 .masthead__name {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--t-base);
-  letter-spacing: -0.01em;
+  font-weight: 500;
+  font-size: var(--t-md);
+  letter-spacing: 0;
 }
 
 .masthead__nav {
   display: flex;
-  gap: 1.5rem;
+  /* Block Craft is wider than the sans it replaced, so on a narrow phone the
+     row has to be able to wrap between links rather than inside one. */
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  font-family: var(--font-display);
+  font-weight: 500;
   font-size: var(--t-sm);
   color: var(--ink-soft);
 }
@@ -170,12 +236,88 @@ ul {
 .masthead__nav a {
   border-bottom: 1px solid transparent;
   padding-bottom: 2px;
+  white-space: nowrap;
   transition: color 0.18s ease, border-color 0.18s ease;
 }
 
 .masthead__nav a:hover {
   color: var(--ink);
   border-bottom-color: var(--rule-strong);
+}
+
+/* ---------------------------------------------------------------
+   Theme switch — a hard-shadowed arcade key that physically travels
+   into the page when pressed. Stepped transitions, no easing: the
+   whole point is that it snaps.
+   --------------------------------------------------------------- */
+.crt-btn {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  line-height: 1;
+  color: var(--ink);
+  background: var(--accent-soft);
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  padding: 0.6rem 0.7rem;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--ink);
+  transition: transform 0.06s steps(1), box-shadow 0.06s steps(1),
+    background-color 0.06s steps(1), color 0.06s steps(1);
+}
+
+.crt-btn:hover {
+  background: var(--accent);
+  color: var(--paper);
+}
+
+.crt-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--ink);
+}
+
+.crt-btn__face {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.crt-btn__icon {
+  width: 9px;
+  height: 9px;
+  flex: none;
+}
+
+/* Which face shows is CSS, not JavaScript, so the label can never
+   disagree with the theme the inline head script already applied. */
+.crt-btn__face--dark {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .crt-btn__face--light {
+    display: none;
+  }
+  :root:not([data-theme="light"]) .crt-btn__face--dark {
+    display: inline-flex;
+  }
+}
+
+:root[data-theme="light"] .crt-btn__face--light {
+  display: inline-flex;
+}
+
+:root[data-theme="light"] .crt-btn__face--dark {
+  display: none;
+}
+
+:root[data-theme="dark"] .crt-btn__face--light {
+  display: none;
+}
+
+:root[data-theme="dark"] .crt-btn__face--dark {
+  display: inline-flex;
 }
 
 /* ---------------------------------------------------------------
@@ -194,11 +336,95 @@ ul {
 }
 
 .hero__statement {
-  font-size: clamp(1.75rem, 4.6vw, 3.15rem);
-  line-height: 1.1;
-  max-width: 20ch;
+  font-size: clamp(1.5rem, 3.7vw, 2.5rem);
+  line-height: 1.25;
+  max-width: 21ch;
   margin: 0;
   text-wrap: balance;
+}
+
+/* ---------------------------------------------------------------
+   Binary waterfall
+   Page background, not an object on the page: no frame, no panel, no
+   surface of its own. Two nested masks dissolve every edge — horizontal
+   on the wrapper, vertical on the columns — so it has no boundary left
+   to read as a picture, and it never gets dense enough to fight the
+   headline sitting in front of it.
+   --------------------------------------------------------------- */
+.hero__stage {
+  position: relative;
+}
+
+/* Lifts the headline out of the waterfall. */
+.hero__text {
+  position: relative;
+  z-index: 1;
+}
+
+.rain {
+  position: absolute;
+  /* Overshoots the text block top and bottom, and runs out past the shell
+     gutter on the right, so the waterfall has no visible start or end. */
+  top: -2.5rem;
+  bottom: -2.5rem;
+  left: 38%;
+  right: calc(var(--gutter) * -1);
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 55%, #000 82%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 55%, #000 82%, transparent 100%);
+}
+
+/* Narrow screens: the headline reflows full width, so the waterfall moves
+   behind it and drops back further to stay out of the way. */
+@media (max-width: 52rem) {
+  .rain {
+    /* Nothing to sit beside once the headline is full width, so it keeps off
+       the line starts and drops back far enough to read as texture. */
+    left: 30%;
+    opacity: 0.5;
+  }
+}
+
+.rain__cols {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--rain-dim);
+  white-space: pre;
+  user-select: none;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 26%, #000 64%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 26%, #000 64%, transparent 100%);
+}
+
+.rain__col {
+  flex: 1 1 0;
+  text-align: center;
+  animation-name: rain-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+/* Every column holds its digits twice, so half a column is exactly one
+   period and the loop has no seam. */
+@keyframes rain-fall {
+  from {
+    transform: translateY(-50%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.rain__col--lit {
+  color: var(--rain-lit);
+  text-shadow: var(--rain-glow);
 }
 
 /* Career axis */
@@ -315,10 +541,11 @@ ul {
 }
 
 .band__label {
-  font-size: var(--t-sm);
-  font-weight: 500;
+  font-family: var(--font-pixel);
+  font-size: 0.65rem;
+  font-weight: 400;
+  line-height: 1.8;
   color: var(--ink-faint);
-  font-family: var(--font-display);
   letter-spacing: 0;
   position: sticky;
   top: 2rem;
@@ -473,7 +700,7 @@ ul {
 }
 
 /* ---------------------------------------------------------------
-   Selected work — engineering notes, not cards
+   Case notes — engineering notes, not cards
    --------------------------------------------------------------- */
 .notes {
   display: grid;

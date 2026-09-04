@@ -4,12 +4,11 @@ export const profile = {
   location: "Apeldoorn, Netherlands",
   email: "naderghanem@outlook.com",
   linkedin: "https://www.linkedin.com/in/naderghanem/",
-  // TODO: replace with your GitHub username, or delete this line to hide the link.
   github: "https://github.com/naderghanem",
   statement:
     "I build the parts of a product nobody sees: the queues, APIs and data flows that have to keep running.",
   intro: [
-    "Backend engineer with ten years in the field, most of it in PHP and Symfony, and most of that spent on systems where failure is expensive — a European SaaS platform and a high-volume logistics operation.",
+    "Backend engineer on systems where failure is expensive, a European SaaS platform, a high-volume logistics operation. PHP and Symfony are where I've gone deepest, with production work in Python and JavaScript alongside it. The problems that take the time are the same in any language: queues that recover, queries that hold up under load, and enough observability that someone other than me can find the fault.",
     "I care about clean code and practical solutions over clever ones. I'm a PSM II certified Scrum Master, so I'm comfortable leading technical decisions and unblocking the people around me.",
   ],
 };
@@ -41,11 +40,6 @@ export const roles = [
     summary:
       "SaaS platform for security awareness training and phishing simulation, used by companies across Europe.",
     points: [
-      "Build and maintain backend services in PHP and Symfony, including REST APIs and Doctrine migrations.",
-      "Designed a custom SMTP retry strategy that stops endless retries on permanent failures, cutting queue noise and false alerts.",
-      "Led a PDF summary export feature end to end, from planning through release.",
-      "Built Grafana and Loki dashboards so the support team can see errors and failures without asking engineering.",
-      "Work alongside front-end developers, designers and product managers to ship features people actually use.",
     ],
   },
   {
@@ -60,10 +54,6 @@ export const roles = [
     period: "Jul 2021 — Jul 2023",
     summary: "High-volume logistics platform where a slow query is a delayed shipment.",
     points: [
-      "Built modular backend components in PHP and Symfony for high-volume logistics applications.",
-      "Improved SQL queries and data flow, reducing latency in time-sensitive operations.",
-      "Worked closely with QA to validate features and catch edge cases before release.",
-      "Shipped in an Agile Scrum team with frequent production releases.",
     ],
   },
   {
@@ -78,9 +68,6 @@ export const roles = [
     period: "Jan 2020 — Jan 2021",
     summary: "Web platforms glued to a set of older internal services.",
     points: [
-      "Integrated third-party APIs into web platforms.",
-      "Wrote Python scripts connecting Java-based services to internal database systems.",
-      "Handled support tickets and user-reported issues.",
     ],
   },
   {
@@ -95,8 +82,6 @@ export const roles = [
     period: "Aug 2019 — Dec 2019",
     summary: "Data collection at scale from public sources.",
     points: [
-      "Built Python applications for web data extraction using Scrapy, Selenium and BeautifulSoup.",
-      "Maintained the database systems storing and serving the collected data.",
     ],
   },
   {
@@ -111,8 +96,6 @@ export const roles = [
     period: "Jun 2016 — Jul 2019",
     summary: "Where the PHP and Symfony started.",
     points: [
-      "Built and maintained web applications in PHP, Symfony, JavaScript and MySQL.",
-      "Took part in planning and prototyping new products with the team.",
     ],
   },
 ];
@@ -121,9 +104,8 @@ export const credentials = [
   {
     title: "Professional Scrum Master II",
     issuer: "Scrum.org",
-    note: "PSM II — advanced Scrum Master certification covering servant leadership, team dynamics and evidence-based delivery.",
-    // TODO: paste your Scrum.org credential URL here to make this a link, or leave empty.
-    url: "",
+    note: "PSM II, advanced Scrum Master certification covering servant leadership, team dynamics and evidence-based delivery.",
+    url: "https://www.credly.com/badges/48b66abc-ca64-40b6-90ad-9607a902c6c7/public_url",
   },
 ];
 

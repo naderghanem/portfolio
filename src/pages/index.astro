@@ -47,6 +47,38 @@ const segments = roles.map((role) => ({
 // Labels are HTML, not SVG <text>: SVG text scales with the viewBox and would
 // shrink to a few pixels on a phone.
 const shift = { start: "none", mid: "translateX(-50%)", end: "translateX(-100%)" };
+
+// Binary waterfall beside the headline. Generated once at build time from a
+// fixed seed, so the markup is byte-identical between builds instead of
+// churning the diff, and the browser ships no generator script.
+const RAIN_COLUMNS = 28;
+const RAIN_GLYPHS = 34;
+
+// mulberry32 — a plain LCG here leaves a visible 0101 stripe down the columns.
+const seeded = (seed: number) => () => {
+  seed = (seed + 0x6d2b79f5) >>> 0;
+  let t = seed;
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+const random = seeded(20260904);
+
+const rain = Array.from({ length: RAIN_COLUMNS }, () => {
+  const digits = Array.from({ length: RAIN_GLYPHS }, () =>
+    random() < 0.5 ? "0" : "1"
+  ).join("\n");
+  return {
+    // Doubled: half a column is exactly one period, so the fall loops seamlessly.
+    stream: `${digits}\n${digits}`,
+    duration: (7 + random() * 11).toFixed(2),
+    // Negative delay, so every column is already mid-fall on first paint.
+    delay: (-random() * 20).toFixed(2),
+    lit: random() < 0.3,
+  };
+});
+
+const currentYear = new Date().getFullYear();
 ---
 
 <Base
@@ -56,18 +88,81 @@ const shift = { start: "none", mid: "translateX(-50%)", end: "translateX(-100%)"
   <div class="shell">
     <header class="masthead">
       <span class="masthead__name">{profile.name}</span>
-      <nav class="masthead__nav" aria-label="Sections">
-        <a href="#stack">Stack</a>
-        <a href="#work">Work</a>
-        <a href="#selected">Selected work</a>
-        <a href="#contact">Contact</a>
-      </nav>
+      <div class="masthead__end">
+        <nav class="masthead__nav" aria-label="Sections">
+          <a href="#skills">Skills</a>
+          <a href="#experience">Experience</a>
+          <a href="#notes">Case notes</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <button
+          class="crt-btn"
+          type="button"
+          data-theme-toggle
+          aria-label="Switch colour theme"
+        >
+          <span class="crt-btn__face crt-btn__face--light">
+            <svg
+              class="crt-btn__icon"
+              viewBox="0 0 9 9"
+              shape-rendering="crispEdges"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <rect x="3" y="3" width="3" height="3" />
+              <rect x="4" y="0" width="1" height="1" />
+              <rect x="4" y="8" width="1" height="1" />
+              <rect x="0" y="4" width="1" height="1" />
+              <rect x="8" y="4" width="1" height="1" />
+              <rect x="1" y="1" width="1" height="1" />
+              <rect x="7" y="1" width="1" height="1" />
+              <rect x="1" y="7" width="1" height="1" />
+              <rect x="7" y="7" width="1" height="1" />
+            </svg>
+            LIGHT
+          </span>
+          <span class="crt-btn__face crt-btn__face--dark">
+            <svg
+              class="crt-btn__icon"
+              viewBox="0 0 9 9"
+              shape-rendering="crispEdges"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <rect x="3" y="1" width="3" height="1" />
+              <rect x="2" y="2" width="3" height="1" />
+              <rect x="1" y="3" width="3" height="1" />
+              <rect x="1" y="4" width="3" height="1" />
+              <rect x="1" y="5" width="3" height="1" />
+              <rect x="2" y="6" width="3" height="1" />
+              <rect x="3" y="7" width="3" height="1" />
+            </svg>
+            DARK
+          </span>
+        </button>
+      </div>
     </header>
 
     <main id="main">
       <section class="hero">
-        <p class="hero__role">{profile.role}, {profile.location}</p>
-        <h1 class="hero__statement">{profile.statement}</h1>
+        <div class="hero__stage">
+          <div class="rain" aria-hidden="true">
+            <div class="rain__cols">
+              {rain.map((col) => (
+                <span
+                  class:list={["rain__col", { "rain__col--lit": col.lit }]}
+                  style={`animation-duration:${col.duration}s;animation-delay:${col.delay}s`}
+                >{col.stream}</span>
+              ))}
+            </div>
+          </div>
+
+          <div class="hero__text">
+            <p class="hero__role">{profile.role}, {profile.location}</p>
+            <h1 class="hero__statement">{profile.statement}</h1>
+          </div>
+        </div>
+
         <div class="axis" role="img" aria-label="Career timeline running from 2016 to the present, with the current role beginning in 2023.">
           <svg class="axis__svg" viewBox="0 0 1000 60" preserveAspectRatio="none" aria-hidden="true">
             <line class="axis__rule" x1={AXIS.x0} y1="30" x2={AXIS.x1} y2="30" />
@@ -103,7 +198,7 @@ const shift = { start: "none", mid: "translateX(-50%)", end: "translateX(-100%)"
               </span>
             ))}
           </div>
-          <p class="axis__caption">Ten years, five teams, the last six in the Netherlands.</p>
+          <p class="axis__caption">SaaS, logistics, data pipelines and the web work that came before.</p>
         </div>
       </section>
 
@@ -116,9 +211,9 @@ const shift = { start: "none", mid: "translateX(-50%)", end: "translateX(-100%)"
         </div>
       </section>
 
-      <section class="band" id="stack">
+      <section class="band" id="skills">
         <div class="band__grid">
-          <h2 class="band__label">Stack</h2>
+          <h2 class="band__label">Skills</h2>
           <div class="stack">
             {stack.map((row) => (
               <div class="stack__row">
@@ -130,9 +225,9 @@ const shift = { start: "none", mid: "translateX(-50%)", end: "translateX(-100%)"
         </div>
       </section>
 
-      <section class="band" id="work">
+      <section class="band" id="experience">
         <div class="band__grid">
-          <h2 class="band__label">Work</h2>
+          <h2 class="band__label">Experience</h2>
           <div class="work">
             {roles.map((role) => (
               <article class:list={["role", { "role--current": role.end === null }]}>
@@ -151,9 +246,9 @@ const shift = { start: "none", mid: "translateX(-50%)", end: "translateX(-100%)"
         </div>
       </section>
 
-      <section class="band" id="selected">
+      <section class="band" id="notes">
         <div class="band__grid">
-          <h2 class="band__label">Selected work</h2>
+          <h2 class="band__label">Case notes</h2>
           <div class="notes">
             {projects.map((project) => (
               <article class="note">
@@ -183,8 +278,8 @@ const shift = { start: "none", mid: "translateX(-50%)", end: "translateX(-100%)"
                 <p class="cred__issuer">{cred.issuer}</p>
                 <p class="cred__note">{cred.note}</p>
                 {cred.url && (
-                  <a class="cred__link" href={cred.url} rel="noopener">
-                    Verify this credential
+                  <a class="cred__link" href={cred.url} target="_blank" rel="noopener noreferrer">
+                    View Badge
                   </a>
                 )}
               </div>
@@ -211,7 +306,7 @@ const shift = { start: "none", mid: "translateX(-50%)", end: "translateX(-100%)"
     </main>
 
     <footer class="contact" id="contact">
-      <h2 class="contact__lead">Open to backend roles in the Netherlands.</h2>
+      <h2 class="contact__lead">Let's talk!</h2>
       <div class="contact__list">
         <div class="contact__item">
           <span class="contact__key">Email</span>
@@ -222,14 +317,14 @@ const shift = { start: "none", mid: "translateX(-50%)", end: "translateX(-100%)"
         <div class="contact__item">
           <span class="contact__key">LinkedIn</span>
           <span class="contact__value">
-            <a href={profile.linkedin} rel="noopener">linkedin.com/in/naderghanem</a>
+            <a href={profile.linkedin} target="_blank" rel="noopener">linkedin.com/in/naderghanem</a>
           </span>
         </div>
         {profile.github && (
           <div class="contact__item">
             <span class="contact__key">GitHub</span>
             <span class="contact__value">
-              <a href={profile.github} rel="noopener">
+              <a href={profile.github} target="_blank" rel="noopener">
                 {profile.github.replace("https://github.com/", "github.com/")}
               </a>
             </span>
@@ -248,7 +343,37 @@ const shift = { start: "none", mid: "translateX(-50%)", end: "translateX(-100%)"
 
     <div class="colophon">
       <span>{profile.name}</span>
-      <span>Built with Astro</span>
+      <span>{currentYear}</span>
+      <span role="img" aria-label="Coding and Coffee">&#128187; ☕ 🎮</span>
     </div>
   </div>
 </Base>
+
+<script>
+  // The head script has already applied the theme; this only flips it and
+  // remembers the choice. Which label shows is handled in CSS.
+  const root = document.documentElement;
+  const button = document.querySelector<HTMLButtonElement>("[data-theme-toggle]");
+
+  if (button) {
+    const describe = () => {
+      button.setAttribute(
+        "aria-label",
+        root.dataset.theme === "dark" ? "Switch to light theme" : "Switch to dark theme"
+      );
+    };
+
+    describe();
+
+    button.addEventListener("click", () => {
+      const next = root.dataset.theme === "dark" ? "light" : "dark";
+      root.dataset.theme = next;
+      describe();
+      try {
+        localStorage.setItem("theme", next);
+      } catch {
+        // Storage blocked; the choice just does not survive a reload.
+      }
+    });
+  }
+</script>

@@ -26,12 +26,41 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:url" content={canonical} />
     <meta name="twitter:card" content="summary" />
 
+    <!-- Self-hosted and used by the headline, so it is fetched up front
+         rather than discovered when the stylesheet finally references it. -->
+    <link
+      rel="preload"
+      href="/fonts/block-craft-medium.otf"
+      as="font"
+      type="font/otf"
+      crossorigin
+    />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans:wght@400;500&family=Pixelify+Sans:wght@400..700&family=Press+Start+2P&display=swap"
     />
+
+    <!-- Runs before first paint so the page never flashes the wrong theme.
+         Inline and blocking on purpose; deferring it would defeat it. -->
+    <script is:inline>
+      (function () {
+        try {
+          var saved = localStorage.getItem("theme");
+          document.documentElement.dataset.theme =
+            saved === "light" || saved === "dark"
+              ? saved
+              : window.matchMedia("(prefers-color-scheme: dark)").matches
+                ? "dark"
+                : "light";
+        } catch (e) {
+          /* Private mode with storage blocked: fall through to the CSS
+             prefers-color-scheme rules, which cover this on their own. */
+        }
+      })();
+    </script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
