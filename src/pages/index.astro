@@ -48,6 +48,16 @@ const segments = roles.map((role) => ({
 // shrink to a few pixels on a phone.
 const shift = { start: "none", mid: "translateX(-50%)", end: "translateX(-100%)" };
 
+// CV download. The file size is measured from the file itself at build time
+// rather than typed in, so the label cannot go stale when the CV is replaced.
+import { statSync } from "node:fs";
+const CV_PATH = "nader-ghanem-cv.pdf";
+const cv = {
+  href: `/${CV_PATH}`,
+  format: "PDF",
+  size: `${Math.round(statSync(`public/${CV_PATH}`).size / 1024)} KB`,
+};
+
 // Binary waterfall beside the headline. Generated once at build time from a
 // fixed seed, so the markup is byte-identical between builds instead of
 // churning the diff, and the browser ships no generator script.
@@ -307,6 +317,28 @@ const currentYear = new Date().getFullYear();
 
     <footer class="contact" id="contact">
       <h2 class="contact__lead">Let's talk!</h2>
+
+      <div class="contact__cta">
+        <a class="crt-btn crt-btn--lg" href={cv.href} download>
+          <svg
+            class="crt-btn__icon"
+            viewBox="0 0 9 9"
+            shape-rendering="crispEdges"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <rect x="3" y="0" width="3" height="3" />
+            <rect x="1" y="3" width="7" height="1" />
+            <rect x="2" y="4" width="5" height="1" />
+            <rect x="3" y="5" width="3" height="1" />
+            <rect x="4" y="6" width="1" height="1" />
+            <rect x="0" y="8" width="9" height="1" />
+          </svg>
+          DOWNLOAD CV
+        </a>
+        <span class="contact__meta">{cv.format}, {cv.size}</span>
+      </div>
+
       <div class="contact__list">
         <div class="contact__item">
           <span class="contact__key">Email</span>
