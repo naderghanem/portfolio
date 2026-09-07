@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import { getCollection, render } from "astro:content";
+import * as simpleIcons from "simple-icons";
 import {
   profile,
   stack,
@@ -52,10 +53,13 @@ const shift = { start: "none", mid: "translateX(-50%)", end: "translateX(-100%)"
 // rather than typed in, so the label cannot go stale when the CV is replaced.
 import { statSync } from "node:fs";
 const CV_PATH = "nader-ghanem-cv.pdf";
+// Measured on its own line: a template literal nested inside another one
+// confuses the frontmatter scanner, which then truncates the block.
+const cvBytes = statSync(`public/${CV_PATH}`).size;
 const cv = {
   href: `/${CV_PATH}`,
   format: "PDF",
-  size: `${Math.round(statSync(`public/${CV_PATH}`).size / 1024)} KB`,
+  size: `${Math.round(cvBytes / 1024)} KB`,
 };
 
 // Binary waterfall beside the headline. Generated once at build time from a
@@ -87,6 +91,24 @@ const rain = Array.from({ length: RAIN_COLUMNS }, () => {
     lit: random() < 0.3,
   };
 });
+
+type SimpleIcon = { slug: string; path: string };
+
+const iconPaths = new Map<string, string>();
+for (const icon of Object.values(simpleIcons) as SimpleIcon[]) {
+  if (icon?.slug) iconPaths.set(icon.slug, icon.path);
+}
+
+// Each tile resolved to a path or a lettered mark up front, so the template
+// carries no branching of its own beyond picking one of the two.
+const tiles = stack.map((row) => ({
+  layer: row.layer,
+  items: row.items.map((item) => ({
+    name: item.name,
+    path: item.icon ? iconPaths.get(item.icon) : undefined,
+    mark: item.mark ?? item.name.slice(0, 2),
+  })),
+}));
 
 const currentYear = new Date().getFullYear();
 ---
@@ -168,7 +190,7 @@ const currentYear = new Date().getFullYear();
           </div>
 
           <div class="hero__text">
-            <p class="hero__role">{profile.role}, {profile.location}</p>
+            <p class="hero__role">{profile.role} | {profile.location}</p>
             <h1 class="hero__statement">{profile.statement}</h1>
           </div>
         </div>
@@ -208,7 +230,7 @@ const currentYear = new Date().getFullYear();
               </span>
             ))}
           </div>
-          <p class="axis__caption">SaaS, logistics, data pipelines and the web work that came before.</p>
+          <p class="axis__caption">I build simple & clean.</p>
         </div>
       </section>
 
@@ -225,10 +247,28 @@ const currentYear = new Date().getFullYear();
         <div class="band__grid">
           <h2 class="band__label">Skills</h2>
           <div class="stack">
-            {stack.map((row) => (
-              <div class="stack__row">
-                <span class="stack__layer">{row.layer}</span>
-                <span class="stack__items">{row.items.join(", ")}</span>
+            {tiles.map((row) => (
+              <div class="stack__group">
+                <h3 class="stack__layer">{row.layer}</h3>
+                <ul class="stack__tiles">
+                  {row.items.map((item) => (
+                    <li class="stack__tile">
+                      {item.path ? (
+                        <svg
+                          class="stack__mark"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path d={item.path} />
+                        </svg>
+                      ) : (
+                        <span class="stack__mark stack__mark--letters" aria-hidden="true">{item.mark}</span>
+                      )}
+                      <span class="stack__name">{item.name}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
@@ -364,7 +404,11 @@ const currentYear = new Date().getFullYear();
         )}
         <div class="contact__item">
           <span class="contact__key">Based in</span>
-          <span class="contact__value">{profile.location}</span>
+          <span class="contact__value">
+            <a href="https://www.google.com/maps/search/?api=1&query=Apeldoorn%2C+Netherlands" target="_blank" rel="noopener noreferrer">
+              {profile.location}
+            </a>
+          </span>
         </div>
         <div class="contact__item">
           <span class="contact__key">Languages</span>
@@ -372,40 +416,14 @@ const currentYear = new Date().getFullYear();
         </div>
       </div>
     </footer>
-
-    <div class="colophon">
-      <span>{profile.name}</span>
-      <span>{currentYear}</span>
-      <span role="img" aria-label="Coding and Coffee">&#128187; ☕ 🎮</span>
-    </div>
+      <div class="colophon">
+          <span>{'< '}Built with passion by {profile.name}{' />'}</span>
+          <span role="img" aria-label="Coding, Coffee, and Gaming">&#128187; ☕ 🎮</span>
+          <span>© {currentYear} All rights reserved</span>
+      </div>
   </div>
+
+  <script>
+    import "../scripts/theme-toggle.ts";
+  </script>
 </Base>
-
-<script>
-  // The head script has already applied the theme; this only flips it and
-  // remembers the choice. Which label shows is handled in CSS.
-  const root = document.documentElement;
-  const button = document.querySelector<HTMLButtonElement>("[data-theme-toggle]");
-
-  if (button) {
-    const describe = () => {
-      button.setAttribute(
-        "aria-label",
-        root.dataset.theme === "dark" ? "Switch to light theme" : "Switch to dark theme"
-      );
-    };
-
-    describe();
-
-    button.addEventListener("click", () => {
-      const next = root.dataset.theme === "dark" ? "light" : "dark";
-      root.dataset.theme = next;
-      describe();
-      try {
-        localStorage.setItem("theme", next);
-      } catch {
-        // Storage blocked; the choice just does not survive a reload.
-      }
-    });
-  }
-</script>

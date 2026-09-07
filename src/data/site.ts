@@ -13,17 +13,95 @@ export const profile = {
   ],
 };
 
-export const stack = [
-  { layer: "Languages", items: ["PHP", "SQL", "JavaScript", "Python"] },
-  { layer: "Frameworks", items: ["Symfony", "Laravel", "Doctrine ORM"] },
-  { layer: "Frontend", items: ["Vue.js", "Inertia.js", "Angular"] },
-  { layer: "Data", items: ["MySQL", "PostgreSQL", "Redis"] },
-  { layer: "Messaging", items: ["RabbitMQ", "Symfony Messenger"] },
-  { layer: "Infrastructure", items: ["Docker", "Kubernetes", "CircleCI", "AWS Lambda"] },
-  { layer: "Observability", items: ["Grafana", "Loki", "Mimir", "CloudWatch"] },
-  { layer: "Storage", items: ["MinIO", "S3"] },
-  { layer: "Testing", items: ["Pest", "PHPUnit", "Zenstruck Foundry"] },
-  { layer: "AI", items: ["OpenAI API", "LangChain", "Prompt engineering"] },
+/* Each item carries either `icon` — a Simple Icons slug, resolved to a path at
+   build time — or `mark`, a short lettered stand-in. Eleven of these have no
+   mark in the set: AWS and OpenAI were withdrawn over trademark requests, and
+   the Grafana satellites, the PHP test runners and plain SQL never had one. */
+type StackItem = { name: string; icon?: string; mark?: string };
+
+export const stack: { layer: string; items: StackItem[] }[] = [
+  {
+    layer: "Languages",
+    items: [
+      { name: "PHP", icon: "php" },
+      { name: "SQL", mark: "SQL" },
+      { name: "JavaScript", icon: "javascript" },
+      { name: "Python", icon: "python" },
+    ],
+  },
+  {
+    layer: "Frameworks",
+    items: [
+      { name: "Symfony", icon: "symfony" },
+      { name: "Laravel", icon: "laravel" },
+      { name: "Doctrine ORM", icon: "doctrine" },
+    ],
+  },
+  {
+    layer: "Frontend",
+    items: [
+      { name: "Vue.js", icon: "vuedotjs" },
+      { name: "Inertia.js", icon: "inertia" },
+      { name: "Angular", icon: "angular" },
+    ],
+  },
+  {
+    layer: "Data",
+    items: [
+      { name: "MySQL", icon: "mysql" },
+      { name: "PostgreSQL", icon: "postgresql" },
+      { name: "Redis", icon: "redis" },
+    ],
+  },
+  {
+    layer: "Messaging",
+    items: [
+      { name: "RabbitMQ", icon: "rabbitmq" },
+      // A Symfony component, so it carries the Symfony mark on purpose.
+      { name: "Symfony Messenger", icon: "symfony" },
+    ],
+  },
+  {
+    layer: "Infrastructure",
+    items: [
+      { name: "Docker", icon: "docker" },
+      { name: "Kubernetes", icon: "kubernetes" },
+      { name: "CircleCI", icon: "circleci" },
+      { name: "AWS Lambda", mark: "AWS" },
+    ],
+  },
+  {
+    layer: "Observability",
+    items: [
+      { name: "Grafana", icon: "grafana" },
+      { name: "Loki", mark: "LK" },
+      { name: "Mimir", mark: "MM" },
+      { name: "CloudWatch", mark: "CW" },
+    ],
+  },
+  {
+    layer: "Storage",
+    items: [
+      { name: "MinIO", icon: "minio" },
+      { name: "S3", mark: "S3" },
+    ],
+  },
+  {
+    layer: "Testing",
+    items: [
+      { name: "Pest", mark: "PT" },
+      { name: "PHPUnit", mark: "PU" },
+      { name: "Zenstruck Foundry", mark: "ZF" },
+    ],
+  },
+  {
+    layer: "AI",
+    items: [
+      { name: "OpenAI API", mark: "AI" },
+      { name: "LangChain", icon: "langchain" },
+      { name: "Prompt engineering", mark: "PE" },
+    ],
+  },
 ];
 
 export const roles = [
@@ -122,4 +200,4 @@ export const education = [
   },
 ];
 
-export const languages = ["English", "French", "Arabic"];
+export const languages = ["English", "French", "Dutch", "Arabic"];

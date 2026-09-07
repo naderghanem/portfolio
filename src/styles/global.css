@@ -13,8 +13,14 @@
 
 /* ---------------------------------------------------------------
    Tokens
-   Palette: cool drafting grey + deep slate-teal ink + petrol accent
-   (the "healthy" green of a status dashboard).
+   Palette: three colours, and only three. #18251d and #e6e9e0 trade places
+   between the themes — paper in one is ink in the other — and #708259 sits
+   in both unchanged. Everything else on the page is a mix of those, so the
+   two themes are the same palette rather than two palettes kept in sync.
+
+   Mixing happens in oklab, not sRGB: an equal step there reads as an equal
+   step to the eye, which is what keeps a tone at the same place in the
+   hierarchy after paper and ink swap.
 
    Theming: light values live on :root. The dark set is written twice —
    once for the system preference, once for an explicit data-theme="dark"
@@ -24,20 +30,28 @@
 :root {
   color-scheme: light;
 
-  --paper: #F3F2EC;
-  --paper-raised: #f6f7f6;
-  --ink: #1b2b2a;
-  --ink-soft: #52635f;
-  --ink-faint: #8a9995;
-  --rule: #d2d9d6;
-  --rule-strong: #b9c3bf;
-  --accent: #0b6e5f;
-  --accent-soft: #dfebe7;
+  /* The three. Swapping the first two is the whole of the dark theme. */
+  --paper: #e6e9e0;
+  --ink: #18251d;
+  --accent: #708259;
 
-  /* The waterfall is page background, not a screen, so it is tinted with the
-     page accent and kept far back. No glow in light: it would read as blur. */
-  --rain-dim: rgba(11, 110, 95, 0.15);
-  --rain-lit: rgba(11, 110, 95, 0.32);
+  /* Derived. The percentages are shared by both themes, so a tone holds its
+     rank in the hierarchy whichever way round paper and ink are. */
+  --ink-soft: color-mix(in oklab, var(--ink) 72%, var(--paper));
+  --ink-faint: color-mix(in oklab, var(--ink) 64%, var(--paper));
+  --rule: color-mix(in oklab, var(--ink) 12%, var(--paper));
+  --rule-strong: color-mix(in oklab, var(--ink) 30%, var(--paper));
+  --accent-soft: color-mix(in oklab, var(--accent) 20%, var(--paper));
+
+  /* #708259 against either ground is ~3.5:1 — enough for a rule or a dot,
+     short of the 4.5:1 small text needs. Pulling the ground's own ink into
+     it keeps the colour and buys the contrast: 4.8:1 light, 5.4:1 dark. */
+  --accent-ink: color-mix(in oklab, var(--ink) 25%, var(--accent));
+
+  /* The waterfall is page background, not a screen, so it is kept far back.
+     No glow in light: it would read as blur. */
+  --rain-dim: color-mix(in oklab, var(--accent) 22%, transparent);
+  --rain-lit: color-mix(in oklab, var(--accent) 42%, transparent);
   --rain-glow: none;
 
   /* One family for the whole page. Space Grotesk covers 300-700 from a single
@@ -62,38 +76,30 @@
   :root:not([data-theme="light"]) {
     color-scheme: dark;
 
-    --paper: #121a19;
-    --paper-raised: #17211f;
-    --ink: #e4eae7;
-    --ink-soft: #9aa9a5;
-    --ink-faint: #6b7c78;
-    --rule: #26332f;
-    --rule-strong: #35443f;
-    --accent: #4fbfa8;
-    --accent-soft: #16302b;
+    /* Only the two swap. Every derived token above follows them. */
+    --paper: #18251d;
+    --ink: #e6e9e0;
 
-    --rain-dim: rgba(53, 245, 138, 0.12);
-    --rain-lit: rgba(53, 245, 138, 0.3);
-    --rain-glow: 0 0 8px rgba(53, 245, 138, 0.28);
+    /* The green loses ground against a dark page, so the waterfall is carried
+       a little harder here, and a glow reads as a phosphor, not blur. */
+    --rain-dim: color-mix(in oklab, var(--accent) 38%, transparent);
+    --rain-lit: color-mix(in oklab, var(--accent) 72%, transparent);
+    --rain-glow: 0 0 8px color-mix(in oklab, var(--accent) 35%, transparent);
   }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --paper: #121a19;
-  --paper-raised: #17211f;
-  --ink: #e4eae7;
-  --ink-soft: #9aa9a5;
-  --ink-faint: #6b7c78;
-  --rule: #26332f;
-  --rule-strong: #35443f;
-  --accent: #4fbfa8;
-  --accent-soft: #16302b;
+  /* Only the two swap. Every derived token above follows them. */
+  --paper: #18251d;
+  --ink: #e6e9e0;
 
-  --rain-dim: rgba(53, 245, 138, 0.12);
-  --rain-lit: rgba(53, 245, 138, 0.3);
-  --rain-glow: 0 0 8px rgba(53, 245, 138, 0.28);
+  /* The green loses ground against a dark page, so the waterfall is carried
+     a little harder here, and a glow reads as a phosphor, not blur. */
+  --rain-dim: color-mix(in oklab, var(--accent) 38%, transparent);
+  --rain-lit: color-mix(in oklab, var(--accent) 72%, transparent);
+  --rain-glow: 0 0 8px color-mix(in oklab, var(--accent) 35%, transparent);
 }
 
 /* ---------------------------------------------------------------
@@ -265,7 +271,7 @@ ul {
 }
 
 .crt-btn:hover {
-  background: var(--accent);
+  background: var(--accent-ink);
   color: var(--paper);
 }
 
@@ -341,7 +347,7 @@ ul {
 
 .hero__role {
   font-size: var(--t-xs);
-  color: var(--accent);
+  color: var(--accent-ink);
   letter-spacing: 0.01em;
   margin: 0 0 1.75rem;
 }
@@ -488,7 +494,7 @@ ul {
 }
 
 .axis__label--now {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 /* Five year marks do not fit on a phone; keep the two that carry the span. */
@@ -571,7 +577,7 @@ ul {
   }
   .band__label {
     position: static;
-    color: var(--accent);
+    color: var(--accent-ink);
   }
 }
 
@@ -580,40 +586,123 @@ ul {
    --------------------------------------------------------------- */
 .stack {
   display: grid;
-  gap: 0;
+  gap: 0.85rem;
 }
 
-.stack__row {
+/* Label beside its tiles, not above them. Most layers hold two to four items,
+   so stacking the label would leave the right half of the column empty and run
+   the section to twice the height for the same 31 tiles. */
+.stack__group {
   display: grid;
-  grid-template-columns: 9rem minmax(0, 1fr);
-  gap: 0.35rem 1.5rem;
-  padding: 0.7rem 0;
-  border-bottom: 1px solid var(--rule);
-  align-items: baseline;
-}
-
-.stack__row:first-child {
-  padding-top: 0;
-}
-
-.stack__row:last-child {
-  border-bottom: 0;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
 }
 
 .stack__layer {
-  font-size: var(--t-sm);
-  color: var(--ink-soft);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  /* Optically level with the mark inside the first tile, not its border. */
+  margin: 1.35rem 0 0;
 }
 
-.stack__items {
-  font-size: var(--t-sm);
+/* Fixed-width tiles rather than a stretching grid: the tile is a chip, and a
+   row of four should not turn into a row of four wide ones when the layer
+   happens to hold four. Flex wrap leaves the last row short, as it should. */
+.stack__tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.stack__tile {
+  width: 5.25rem;
+  min-height: 5.9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.85rem 0.35rem 0.7rem;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: var(--paper);
   color: var(--ink);
-  line-height: 1.7;
+  transition: transform 0.18s ease, border-color 0.18s ease,
+    background-color 0.18s ease, color 0.18s ease;
 }
 
-@media (max-width: 34rem) {
-  .stack__row {
+/* The lift is the whole interaction. Nothing here navigates, so the tile is
+   not focusable — a tab stop that goes nowhere is worse than no tab stop. */
+.stack__tile:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+.stack__tile:hover .stack__name {
+  color: var(--ink);
+}
+
+.stack__mark {
+  width: 22px;
+  height: 22px;
+  flex: none;
+}
+
+/* A lettered mark has to be free to grow sideways — "AWS" and "SQL" do not fit
+   the square a logo sits in — while still lining up with one vertically. */
+.stack__mark--letters {
+  width: auto;
+  min-width: 22px;
+  padding: 0 0.28rem;
+}
+
+/* The eleven without a brand mark. Sized and weighted to sit where a logo
+   sits, so a lettered tile reads as a choice rather than a missing image. */
+.stack__mark--letters {
+  display: grid;
+  place-items: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  border: 1px solid currentColor;
+  border-radius: 2px;
+}
+
+.stack__tile:hover .stack__mark--letters {
+  color: var(--ink);
+}
+
+.stack__name {
+  font-size: 0.72rem;
+  line-height: 1.25;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--ink-soft);
+  transition: color 0.18s ease;
+}
+
+@media (max-width: 46rem) {
+  .stack__group {
     grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+  .stack__layer {
+    margin: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stack__tile:hover {
+    transform: none;
   }
 }
 
@@ -761,7 +850,7 @@ ul {
   gap: 0.4rem 0.75rem;
   margin-top: 0.9rem;
   font-size: var(--t-xs);
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 @media (max-width: 46rem) {
@@ -807,7 +896,7 @@ ul {
   display: inline-block;
   margin-top: 0.6rem;
   font-size: var(--t-sm);
-  color: var(--accent);
+  color: var(--accent-ink);
   border-bottom: 1px solid currentColor;
 }
 
@@ -906,8 +995,8 @@ ul {
 }
 
 .contact__value a:hover {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
+  color: var(--accent-ink);
+  border-bottom-color: var(--accent-ink);
 }
 
 @media (max-width: 34rem) {
@@ -923,7 +1012,8 @@ ul {
   font-size: var(--t-xs);
   color: var(--ink-faint);
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
 }

@@ -7,7 +7,8 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
-const canonical = new URL(Astro.url.pathname, Astro.site);
+// `site` is set in astro.config.mjs, so this always resolves.
+const canonical = new URL(Astro.url.pathname, Astro.site!);
 ---
 
 <!doctype html>
@@ -42,7 +43,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <script is:inline>
       (function () {
         try {
-          var saved = localStorage.getItem("theme");
+          const saved = localStorage.getItem("theme");
           document.documentElement.dataset.theme =
             saved === "light" || saved === "dark"
               ? saved

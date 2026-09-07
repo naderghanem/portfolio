@@ -1,10 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
-  <rect width="16" height="16" rx="3" fill="#0a1a14"/>
-  <g fill="#35f58a">
+  <rect width="16" height="16" rx="3" fill="#18251d"/>
+  <!-- Frame in the accent that both themes share; the prompt itself in the
+       light of the pair, so it still reads at 16px. -->
+  <g fill="#708259">
     <rect x="2" y="3" width="12" height="1"/>
     <rect x="2" y="12" width="12" height="1"/>
     <rect x="2" y="4" width="1" height="8"/>
     <rect x="13" y="4" width="1" height="8"/>
+  </g>
+  <g fill="#e6e9e0">
     <rect x="4" y="6" width="1" height="1"/>
     <rect x="5" y="7" width="1" height="1"/>
     <rect x="6" y="8" width="1" height="1"/>
