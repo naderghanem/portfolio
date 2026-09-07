@@ -1,13 +1,12 @@
 /* ---------------------------------------------------------------
-   Block Craft Medium — self-hosted, it is on no font CDN.
-   The file ships one weight. Declaring the 400-700 range against it
-   claims that whole span, so the browser reaches for this face instead
-   of smearing a synthetic bold over a blocky display face.
+   Space Grotesk — self-hosted variable font, one file for the whole
+   300-700 range. Declaring that span lets the browser interpolate the
+   real weights instead of synthesising a bold.
    --------------------------------------------------------------- */
 @font-face {
-  font-family: "Block Craft";
-  src: url("/fonts/block-craft-medium.otf") format("opentype");
-  font-weight: 400 700;
+  font-family: "Space Grotesk";
+  src: url("/fonts/space-grotesk-variable.ttf") format("truetype-variations");
+  font-weight: 300 700;
   font-style: normal;
   font-display: swap;
 }
@@ -41,12 +40,10 @@
   --rain-lit: rgba(11, 110, 95, 0.32);
   --rain-glow: none;
 
-  /* Pixelify Sans carries the headings; Press Start 2P is rationed out to
-     section labels and the theme switch, where a word or two stays legible. */
-  --font-display: "Block Craft", "Pixelify Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-pixel: "Press Start 2P", "Pixelify Sans", ui-monospace, monospace;
-  --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+  /* One family for the whole page. Space Grotesk covers 300-700 from a single
+     variable file, so hierarchy is carried by size, weight and tracking rather
+     than by switching typeface. */
+  --font: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
 
   /* Perfect-fourth-ish scale */
   --t-xs: 0.8125rem;
@@ -130,7 +127,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--font-body);
+  font-family: var(--font);
   font-size: var(--t-base);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -140,7 +137,6 @@ body {
 h1,
 h2,
 h3 {
-  font-family: var(--font-display);
   font-weight: 500;
   letter-spacing: 0;
   line-height: 1.22;
@@ -215,7 +211,6 @@ ul {
 }
 
 .masthead__name {
-  font-family: var(--font-display);
   font-weight: 500;
   font-size: var(--t-md);
   letter-spacing: 0;
@@ -223,11 +218,10 @@ ul {
 
 .masthead__nav {
   display: flex;
-  /* Block Craft is wider than the sans it replaced, so on a narrow phone the
-     row has to be able to wrap between links rather than inside one. */
+  /* The nav sits on one line at desktop width; on a narrow phone the row
+     has to be able to wrap between links rather than inside one. */
   flex-wrap: wrap;
   gap: 0.5rem 1.5rem;
-  font-family: var(--font-display);
   font-weight: 500;
   font-size: var(--t-sm);
   color: var(--ink-soft);
@@ -253,8 +247,11 @@ ul {
 .crt-btn {
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-pixel);
-  font-size: 0.5rem;
+  font-family: var(--font);
+  /* Uppercase at label size: tracked out so LIGHT/DARK does not set solid. */
+  font-size: var(--t-xs);
+  font-weight: 500;
+  letter-spacing: 0.09em;
   line-height: 1;
   color: var(--ink);
   background: var(--accent-soft);
@@ -282,7 +279,7 @@ ul {
    it presses past its own socket. */
 .crt-btn--lg {
   gap: 0.6rem;
-  font-size: 0.6rem;
+  font-size: var(--t-sm);
   padding: 0.95rem 1.15rem;
   text-decoration: none;
   box-shadow: 4px 4px 0 var(--ink);
@@ -343,7 +340,6 @@ ul {
 }
 
 .hero__role {
-  font-family: var(--font-mono);
   font-size: var(--t-xs);
   color: var(--accent);
   letter-spacing: 0.01em;
@@ -407,7 +403,9 @@ ul {
   inset: 0;
   display: flex;
   align-items: flex-start;
-  font-family: var(--font-mono);
+  /* Space Grotesk sets 0 and 1 to different widths by default; the tabular
+     figures keep each falling column a straight edge. */
+  font-variant-numeric: tabular-nums;
   font-size: 0.75rem;
   line-height: 1.5;
   color: var(--rain-dim);
@@ -483,7 +481,6 @@ ul {
 .axis__label {
   position: absolute;
   top: 0;
-  font-family: var(--font-mono);
   font-size: var(--t-xs);
   line-height: 1;
   color: var(--ink-faint);
@@ -505,7 +502,6 @@ ul {
   margin-top: 1rem;
   font-size: var(--t-xs);
   color: var(--ink-faint);
-  font-family: var(--font-mono);
 }
 
 /* The one orchestrated moment on the page: the axis measures itself out, once.
@@ -556,12 +552,14 @@ ul {
 }
 
 .band__label {
-  font-family: var(--font-pixel);
-  font-size: 0.65rem;
-  font-weight: 400;
+  /* No pixel face to mark these out any more, so the section labels earn
+     their own register: uppercase, tracked, one step under body size. */
+  font-size: var(--t-xs);
+  font-weight: 500;
+  text-transform: uppercase;
   line-height: 1.8;
   color: var(--ink-faint);
-  letter-spacing: 0;
+  letter-spacing: 0.12em;
   position: sticky;
   top: 2rem;
 }
@@ -609,7 +607,6 @@ ul {
 
 .stack__items {
   font-size: var(--t-sm);
-  font-family: var(--font-mono);
   color: var(--ink);
   line-height: 1.7;
 }
@@ -666,13 +663,11 @@ ul {
 }
 
 .role__company {
-  font-family: var(--font-display);
   font-size: var(--t-md);
   font-weight: 500;
 }
 
 .role__period {
-  font-family: var(--font-mono);
   font-size: var(--t-xs);
   color: var(--ink-faint);
   white-space: nowrap;
@@ -740,14 +735,12 @@ ul {
 }
 
 .note__title {
-  font-family: var(--font-display);
   font-size: var(--t-md);
   font-weight: 500;
   margin: 0 0 0.5rem;
 }
 
 .note__context {
-  font-family: var(--font-mono);
   font-size: var(--t-xs);
   color: var(--ink-faint);
   margin: 0;
@@ -767,7 +760,6 @@ ul {
   flex-wrap: wrap;
   gap: 0.4rem 0.75rem;
   margin-top: 0.9rem;
-  font-family: var(--font-mono);
   font-size: var(--t-xs);
   color: var(--accent);
 }
@@ -793,14 +785,12 @@ ul {
 }
 
 .cred__title {
-  font-family: var(--font-display);
   font-size: var(--t-md);
   font-weight: 500;
   margin: 0;
 }
 
 .cred__issuer {
-  font-family: var(--font-mono);
   font-size: var(--t-xs);
   color: var(--ink-faint);
   margin: 0.25rem 0 0;
@@ -848,7 +838,6 @@ ul {
 .school__period {
   grid-row: 1 / span 2;
   grid-column: 2;
-  font-family: var(--font-mono);
   font-size: var(--t-xs);
   color: var(--ink-faint);
   white-space: nowrap;
@@ -863,7 +852,6 @@ ul {
 }
 
 .contact__lead {
-  font-family: var(--font-display);
   font-size: clamp(1.5rem, 3.4vw, 2.25rem);
   font-weight: 500;
   line-height: 1.15;
@@ -882,7 +870,6 @@ ul {
 /* Format and weight up front: a download should say what it is before it
    lands in someone's downloads folder. */
 .contact__meta {
-  font-family: var(--font-mono);
   font-size: var(--t-xs);
   color: var(--ink-faint);
 }
@@ -904,7 +891,6 @@ ul {
 
 .contact__key {
   font-size: var(--t-xs);
-  font-family: var(--font-mono);
   color: var(--ink-faint);
 }
 
@@ -936,7 +922,6 @@ ul {
   padding: 1.5rem 0 3rem;
   font-size: var(--t-xs);
   color: var(--ink-faint);
-  font-family: var(--font-mono);
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 1.5rem;

@@ -26,21 +26,15 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:url" content={canonical} />
     <meta name="twitter:card" content="summary" />
 
-    <!-- Self-hosted and used by the headline, so it is fetched up front
-         rather than discovered when the stylesheet finally references it. -->
+    <!-- The only face on the page, so it is fetched up front rather than
+         discovered when the stylesheet finally references it. No CDN request
+         follows this one. -->
     <link
       rel="preload"
-      href="/fonts/block-craft-medium.otf"
+      href="/fonts/space-grotesk-variable.ttf"
       as="font"
-      type="font/otf"
+      type="font/ttf"
       crossorigin
-    />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans:wght@400;500&family=Pixelify+Sans:wght@400..700&family=Press+Start+2P&display=swap"
     />
 
     <!-- Runs before first paint so the page never flashes the wrong theme.
