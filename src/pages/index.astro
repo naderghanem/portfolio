@@ -1,5 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
+import AskButton from "../components/AskButton.astro";
 import { getCollection, render } from "astro:content";
 import * as simpleIcons from "simple-icons";
 import {
@@ -49,17 +50,13 @@ const segments = roles.map((role) => ({
 // shrink to a few pixels on a phone.
 const shift = { start: "none", mid: "translateX(-50%)", end: "translateX(-100%)" };
 
-// CV download. The file size is measured from the file itself at build time
-// rather than typed in, so the label cannot go stale when the CV is replaced.
-import { statSync } from "node:fs";
-const CV_PATH = "nader-ghanem-cv.pdf";
-// Measured on its own line: a template literal nested inside another one
-// confuses the frontmatter scanner, which then truncates the block.
-const cvBytes = statSync(`public/${CV_PATH}`).size;
+// CV download. Name and size are measured from the real file in
+// astro.config.mjs and inlined here, so the label cannot go stale when the
+// CV is replaced, and nothing touches the filesystem at render time.
 const cv = {
-  href: `/${CV_PATH}`,
+  href: `/${__CV_FILE__}`,
   format: "PDF",
-  size: `${Math.round(cvBytes / 1024)} KB`,
+  size: `${__CV_SIZE_KB__} KB`,
 };
 
 // Binary waterfall beside the headline. Generated once at build time from a
@@ -230,7 +227,9 @@ const currentYear = new Date().getFullYear();
               </span>
             ))}
           </div>
-          <p class="axis__caption">I build simple & clean.</p>
+          <div class="axis__caption">
+            <AskButton />
+          </div>
         </div>
       </section>
 
@@ -311,6 +310,7 @@ const currentYear = new Date().getFullYear();
                 </div>
                 <div class="note__body">
                   <project.Content />
+                  {project.demo && <AskButton class="note__demo" />}
                 </div>
               </article>
             ))}
@@ -423,7 +423,57 @@ const currentYear = new Date().getFullYear();
       </div>
   </div>
 
+  <dialog class="panel" data-chat-panel aria-labelledby="panel-title">
+    <div class="panel__inner">
+      <header class="panel__head">
+        <p class="panel__title" id="panel-title">Ask about my experience</p>
+        <button class="panel__close" type="button" data-chat-close aria-label="Close">
+          <svg viewBox="0 0 9 9" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true">
+            <rect x="0" y="0" width="1" height="1" /><rect x="1" y="1" width="1" height="1" />
+            <rect x="2" y="2" width="1" height="1" /><rect x="3" y="3" width="3" height="3" />
+            <rect x="6" y="6" width="1" height="1" /><rect x="7" y="7" width="1" height="1" />
+            <rect x="8" y="8" width="1" height="1" /><rect x="8" y="0" width="1" height="1" />
+            <rect x="7" y="1" width="1" height="1" /><rect x="6" y="2" width="1" height="1" />
+            <rect x="2" y="6" width="1" height="1" /><rect x="1" y="7" width="1" height="1" />
+            <rect x="0" y="8" width="1" height="1" />
+          </svg>
+        </button>
+      </header>
+
+      <ul class="chat__log" data-chat-log></ul>
+
+      <div class="chat__starters" data-chat-starters>
+        {[
+          "What has he built with Symfony?",
+          "Does he have queue and messaging experience?",
+          "What did he do at CEVA Logistics?",
+          "How do I get in touch?",
+        ].map((q) => (
+          <button class="chat__starter" type="button" data-starter={q}>{q}</button>
+        ))}
+      </div>
+
+      <form class="chat__form" data-chat-form>
+        <label class="chat__label" for="chat-input">Ask about my experience</label>
+        <input
+          class="chat__input"
+          id="chat-input"
+          name="question"
+          type="text"
+          autocomplete="off"
+          maxlength="1000"
+          placeholder="Ask a question…"
+          data-chat-input
+        />
+        <button class="crt-btn" type="submit">
+          <span class="crt-btn__face">SEND</span>
+        </button>
+      </form>
+    </div>
+  </dialog>
+
   <script>
     import "../scripts/theme-toggle.ts";
+    import "../scripts/chat.ts";
   </script>
 </Base>

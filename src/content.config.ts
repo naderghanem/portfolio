@@ -10,6 +10,8 @@ const projects = defineCollection({
     /** Lower numbers appear first. */
     order: z.number(),
     tags: z.array(z.string()).default([]),
+    /** Renders the "ask a question" button inside this note. */
+    demo: z.boolean().default(false),
   }),
 });
 

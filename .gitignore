@@ -5,3 +5,8 @@ dist/
 .env
 .env.production
 .idea/
+
+# Cloudflare local secrets — never commit
+.dev.vars
+.wrangler/
+worker-configuration.d.ts
