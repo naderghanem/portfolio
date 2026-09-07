@@ -9,6 +9,11 @@
  *
  * Runs from `prebuild`, so `npm run build` and Cloudflare's own build both get
  * it without anyone remembering to.
+ *
+ * Invoked with --experimental-strip-types: importing site.ts directly needs
+ * Node's type stripping, which is only on by default from 22.18. Cloudflare's
+ * build image ships 22.16, where the import fails without the flag. The flag
+ * is accepted from 22.6 up, including on Node 24 where stripping is default.
  */
 import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";

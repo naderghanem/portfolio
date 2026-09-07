@@ -7,8 +7,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "node scripts/build-dossier.mjs && astro check",
-    "prebuild": "node scripts/build-dossier.mjs"
+    "check": "node --experimental-strip-types scripts/build-dossier.mjs && astro check",
+    "prebuild": "node --experimental-strip-types scripts/build-dossier.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.124.0",
