@@ -53,7 +53,6 @@ const dossier = [
     [
       `### ${role.title}, ${role.company} (${role.place}) — ${role.period}`,
       role.summary,
-      ...role.points.map((p) => `- ${p}`),
     ].join("\n")
   ),
   "",

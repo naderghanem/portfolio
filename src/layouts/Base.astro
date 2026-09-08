@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { profile } from "../data/site";
 
 interface Props {
   title: string;
@@ -9,6 +10,8 @@ interface Props {
 const { title, description } = Astro.props;
 // `site` is set in astro.config.mjs, so this always resolves.
 const canonical = new URL(Astro.url.pathname, Astro.site!);
+// Scrapers do not resolve relative image paths, so the card image is absolute.
+const ogImage = new URL("/og.png", Astro.site!);
 ---
 
 <!doctype html>
@@ -25,7 +28,15 @@ const canonical = new URL(Astro.url.pathname, Astro.site!);
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:site_name" content={profile.name} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${profile.name} — ${profile.role}`} />
+    <!-- The large card is what LinkedIn, Slack and X render for a 1200x630
+         image; "summary" would crop it to a thumbnail. -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImage} />
 
     <!-- The only face on the page, so it is fetched up front rather than
          discovered when the stylesheet finally references it. No CDN request

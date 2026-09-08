@@ -111,7 +111,15 @@ if (form && input && log) {
         log.scrollTop = log.scrollHeight;
       }
 
-      history.push({ role: "assistant", content: answer });
+      // An empty reply is never appended: the endpoint rejects blank turns,
+      // so storing one would poison every later request in this conversation.
+      if (answer.trim()) {
+        history.push({ role: "assistant", content: answer });
+      } else {
+        history.pop();
+        bubble.classList.add("chat__bubble--error");
+        bubble.textContent = "No answer came back. Try asking again.";
+      }
     } catch (err) {
       bubble.classList.remove("chat__bubble--waiting");
       bubble.classList.add("chat__bubble--error");

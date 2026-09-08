@@ -117,8 +117,6 @@ export const roles = [
     period: "Sep 2023 — present",
     summary:
       "SaaS platform for security awareness training and phishing simulation, used by companies across Europe.",
-    points: [
-    ],
   },
   {
     company: "CEVA Logistics",
@@ -131,8 +129,6 @@ export const roles = [
     end: 2023,
     period: "Jul 2021 — Jul 2023",
     summary: "High-volume logistics platform where a slow query is a delayed shipment.",
-    points: [
-    ],
   },
   {
     company: "GIMtransfer",
@@ -145,8 +141,6 @@ export const roles = [
     end: 2021,
     period: "Jan 2020 — Jan 2021",
     summary: "Web platforms glued to a set of older internal services.",
-    points: [
-    ],
   },
   {
     company: "DATABIZ",
@@ -159,8 +153,6 @@ export const roles = [
     end: 2019,
     period: "Aug 2019 — Dec 2019",
     summary: "Data collection at scale from public sources.",
-    points: [
-    ],
   },
   {
     company: "CIEG+",
@@ -173,8 +165,6 @@ export const roles = [
     end: 2019,
     period: "Jun 2016 — Jul 2019",
     summary: "Where the PHP and Symfony started.",
-    points: [
-    ],
   },
 ];
 

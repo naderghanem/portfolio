@@ -5,7 +5,7 @@ const projects = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/projects" }),
   schema: z.object({
     title: z.string(),
-    /** Domain, deliberately vague — no client-identifying detail. */
+    /** Where the work happened — the employer named in Experience, or "This site". */
     context: z.string(),
     /** Lower numbers appear first. */
     order: z.number(),

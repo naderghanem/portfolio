@@ -775,29 +775,6 @@ ul {
   max-width: var(--measure);
 }
 
-.role__points {
-  margin: 0.85rem 0 0;
-  display: grid;
-  gap: 0.5rem;
-}
-
-.role__points li {
-  position: relative;
-  padding-left: 1.1rem;
-  font-size: var(--t-sm);
-  max-width: var(--measure);
-}
-
-.role__points li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0.72em;
-  width: 6px;
-  height: 1px;
-  background: var(--rule-strong);
-}
-
 /* ---------------------------------------------------------------
    Case notes — engineering notes, not cards
    --------------------------------------------------------------- */
