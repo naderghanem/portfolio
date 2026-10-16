@@ -1,6 +1,6 @@
 export const profile = {
   name: "Nader Ghanem",
-  role: "Backend Software Engineer",
+  role: "Senior Backend Engineer",
   location: "Apeldoorn, Netherlands",
   email: "naderghanem@outlook.com",
   linkedin: "https://www.linkedin.com/in/naderghanem/",
@@ -135,7 +135,7 @@ export const roles = [
     // Decimal years, for the hero axis.
     from: 2020.00,
     to: 2021.00,
-    title: "Web Developer",
+    title: "Backend Developer",
     place: "Arnhem",
     start: 2020,
     end: 2021,
@@ -190,4 +190,4 @@ export const education = [
   },
 ];
 
-export const languages = ["English", "French", "Dutch", "Arabic"];
+export const languages = ["English", "French", "Arabic", "Dutch (learning)"];

@@ -38,13 +38,25 @@ const majorTicks = [
 const minorTicks = [2017, 2018, 2020, 2022, 2024, 2025];
 
 // Each role is a segment on the line, so the axis shows the shape of the
-// career rather than decorating the hero.
-const segments = roles.map((role) => ({
-  label: `${role.company}, ${role.period}`,
-  x1: x(role.from),
-  x2: x(role.to),
-  current: role.end === null,
-}));
+// career rather than decorating the hero. Oldest first, so a role's
+// neighbours in the array are its neighbours on the line.
+const chrono = [...roles].sort((a, b) => a.from - b.from);
+const segments = chrono.map((role, i) => {
+  const prev = chrono[i - 1];
+  const next = chrono[i + 1];
+  // Hover targets meet halfway across each gap, so the whole line is live
+  // and a four-month role is not a five-pixel target.
+  const hitFrom = prev ? pct((prev.to + role.from) / 2) : 0;
+  const hitTo = next ? pct((role.to + next.from) / 2) : 100;
+  return {
+    role,
+    x1: x(role.from),
+    x2: x(role.to),
+    current: role.end === null,
+    center: pct((role.from + role.to) / 2),
+    hit: `left:${hitFrom}%;width:${hitTo - hitFrom}%`,
+  };
+});
 
 // Labels are HTML, not SVG <text>: SVG text scales with the viewBox and would
 // shrink to a few pixels on a phone.
@@ -192,27 +204,69 @@ const currentYear = new Date().getFullYear();
           </div>
         </div>
 
-        <div class="axis" role="img" aria-label="Career timeline running from 2016 to the present, with the current role beginning in 2023.">
-          <svg class="axis__svg" viewBox="0 0 1000 60" preserveAspectRatio="none" aria-hidden="true">
-            <line class="axis__rule" x1={AXIS.x0} y1="30" x2={AXIS.x1} y2="30" />
-            {minorTicks.map((y) => (
-              <line class="axis__tick" x1={x(y)} y1="26" x2={x(y)} y2="34" />
-            ))}
-            {majorTicks.map((t) => (
-              <line class="axis__tick" x1={x(t.year)} y1="20" x2={x(t.year)} y2="40" />
-            ))}
+        <div class="axis" role="group" aria-label="Career timeline, 2016 to now">
+          <div class="axis__track" data-axis>
+            <svg class="axis__svg" viewBox="0 0 1000 60" preserveAspectRatio="none" aria-hidden="true">
+              <line class="axis__rule" x1={AXIS.x0} y1="30" x2={AXIS.x1} y2="30" />
+              {minorTicks.map((y) => (
+                <line class="axis__tick" x1={x(y)} y1="26" x2={x(y)} y2="34" />
+              ))}
+              {majorTicks.map((t) => (
+                <line class="axis__tick" x1={x(t.year)} y1="20" x2={x(t.year)} y2="40" />
+              ))}
+              {segments.map((seg) => (
+                <line
+                  class:list={["axis__seg", { "axis__seg--current": seg.current }]}
+                  x1={seg.x1}
+                  y1="30"
+                  x2={seg.x2}
+                  y2="30"
+                  data-seg
+                />
+              ))}
+            </svg>
+
+            {/* The card reads its text from these, so each role's details are
+                written once, here, and the script only moves them around. */}
             {segments.map((seg) => (
-              <line
-                class:list={["axis__seg", { "axis__seg--current": seg.current }]}
-                x1={seg.x1}
-                y1="30"
-                x2={seg.x2}
-                y2="30"
-              >
-                <title>{seg.label}</title>
-              </line>
+              <button
+                class="axis__hit"
+                type="button"
+                style={seg.hit}
+                aria-label={`${seg.role.company}, ${seg.role.title}, ${seg.role.place}, ${seg.role.period}`}
+                data-hit
+                data-company={seg.role.company}
+                data-role={`${seg.role.title}, ${seg.role.place}`}
+                data-period={seg.role.period}
+                data-from={seg.role.from}
+                data-to={seg.current ? "" : seg.role.to}
+                data-center={seg.center}
+              ></button>
             ))}
-          </svg>
+
+            <div class="axis__tip" data-axis-tip aria-hidden="true">
+              <div class="axis__tip-box">
+                <span class="axis__tip-company" data-tip="company"></span>
+                <span class="axis__tip-role" data-tip="role"></span>
+                <span class="axis__tip-when">
+                  <span class="axis__tip-period" data-tip="period"></span>
+                  <span class="axis__tip-length" data-tip="length"></span>
+                </span>
+              </div>
+              <svg
+                class="axis__tip-caret"
+                viewBox="0 0 8 4"
+                shape-rendering="crispEdges"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <rect x="0" y="0" width="8" height="1" />
+                <rect x="1" y="1" width="6" height="1" />
+                <rect x="2" y="2" width="4" height="1" />
+                <rect x="3" y="3" width="2" height="1" />
+              </svg>
+            </div>
+          </div>
           <div class="axis__labels" aria-hidden="true">
             {majorTicks.map((t) => (
               <span
@@ -471,6 +525,7 @@ const currentYear = new Date().getFullYear();
 
   <script>
     import "../scripts/theme-toggle.ts";
+    import "../scripts/axis.ts";
     import "../scripts/chat.ts";
   </script>
 </Base>

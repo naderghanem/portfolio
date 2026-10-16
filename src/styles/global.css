@@ -543,6 +543,178 @@ ul {
 }
 
 /* ---------------------------------------------------------------
+   Timeline card
+   One card serves every role. Scrub along the line and it glides from
+   role to role; open it fresh and it rises out of the line a few rows
+   at a time, like a handheld's text window, while the company name
+   decodes out of the same 0s and 1s falling behind the headline.
+   --------------------------------------------------------------- */
+.axis__track {
+  position: relative;
+}
+
+/* Invisible targets laid over the line, meeting halfway across each gap,
+   so the whole rule is live. A crosshair, because this is a measured axis
+   being read, not a link being followed. */
+.axis__hit {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: crosshair;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.axis__hit:focus-visible {
+  outline-offset: -2px;
+}
+
+/* While a card is open the other roles step back, so the line reads as
+   one role against the rest. */
+.axis__seg {
+  transition: stroke 0.1s steps(1), stroke-width 0.1s steps(2);
+}
+
+.axis__track[data-active] .axis__seg {
+  stroke: var(--rule-strong);
+}
+
+.axis__track[data-active] .axis__seg.is-active {
+  stroke: var(--ink);
+  stroke-width: 9;
+}
+
+.axis__track[data-active] .axis__seg--current.is-active {
+  stroke: var(--accent);
+}
+
+.axis__tip {
+  position: absolute;
+  left: 0;
+  /* The line runs 26px down the 52px track (y=30 of 60); the caret stops
+     just short of the raised segment. */
+  bottom: calc(100% - 26px + 0.45rem);
+  z-index: 2;
+  transform: translateX(var(--tip-x, 0px));
+  visibility: hidden;
+  pointer-events: none;
+  /* Closed, it is clipped down to a sliver at the line. The hard shadow
+     sits outside the box, so the open clip reaches past it on the right. */
+  clip-path: inset(100% -6px 0 -2px);
+  transition: clip-path 0.12s steps(3), visibility 0s 0.12s,
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.axis__tip[data-open] {
+  visibility: visible;
+  pointer-events: auto;
+  clip-path: inset(-2px -6px 0 -2px);
+  transition: clip-path 0.2s steps(5), visibility 0s,
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Opening fresh: land on the role, no glide in from where it last closed. */
+.axis__tip[data-snap] {
+  transition-property: clip-path, visibility;
+}
+
+/* The same arcade surface as the buttons: square, inked edge, hard shadow. */
+.axis__tip-box {
+  display: grid;
+  min-width: 12.5rem;
+  padding: 0.5rem 0.8rem 0.55rem;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.axis__tip-company {
+  overflow: hidden;
+  font-size: var(--t-sm);
+  font-weight: 500;
+  /* Keeps every flickering 0 and 1 the same width while the name decodes. */
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.axis__tip-role {
+  font-size: var(--t-xs);
+  color: var(--ink-soft);
+}
+
+.axis__tip-when {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-top: 0.3rem;
+  padding-top: 0.3rem;
+  border-top: 1px solid var(--rule);
+  font-size: var(--t-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.axis__tip-period {
+  color: var(--accent-ink);
+}
+
+.axis__tip-length {
+  color: var(--ink-faint);
+}
+
+/* Still running: the period ends on a terminal's block cursor. */
+.axis__tip-period[data-current]::after {
+  content: "";
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  margin-left: 0.3em;
+  vertical-align: -0.15em;
+  background: currentColor;
+  animation: blink 1.1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Hangs below the hard shadow rather than the border, so shadow and caret
+   read as one inked piece. */
+.axis__tip-caret {
+  display: block;
+  width: 16px;
+  height: 8px;
+  margin: 4px 0 0 calc(var(--caret-x, 50%) - 8px);
+  color: var(--ink);
+}
+
+/* On a phone the line sits right under the headline, so the card drops
+   below it instead, over the year marks its own dates stand in for. */
+@media (max-width: 34rem) {
+  .axis__tip {
+    display: flex;
+    flex-direction: column-reverse;
+    top: calc(26px + 0.45rem);
+    bottom: auto;
+    clip-path: inset(0 -6px 100% -2px);
+  }
+  .axis__tip[data-open] {
+    clip-path: inset(-2px -6px -6px -2px);
+  }
+  .axis__tip-caret {
+    margin: 0 0 0 calc(var(--caret-x, 50%) - 8px);
+    transform: scaleY(-1);
+  }
+}
+
+/* ---------------------------------------------------------------
    Sections — narrow label gutter, wide content column
    --------------------------------------------------------------- */
 .band {
@@ -819,6 +991,17 @@ ul {
 
 .note__body p {
   margin-bottom: 0.75em;
+}
+
+.note__body a {
+  border-bottom: 1px solid var(--rule-strong);
+  padding-bottom: 1px;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+.note__body a:hover {
+  color: var(--accent-ink);
+  border-bottom-color: var(--accent-ink);
 }
 
 /* The one note you can act on rather than only read. */

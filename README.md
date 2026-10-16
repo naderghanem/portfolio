@@ -30,7 +30,7 @@ it appears in "Case notes", sorted by `order`.
 ---
 title: "What the thing did"
 context: "Domain it lived in"
-order: 7
+order: 8
 tags: ["Symfony", "Redis"]
 ---
 

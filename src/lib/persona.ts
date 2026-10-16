@@ -2,7 +2,7 @@ import { profile } from "../data/site";
 import { DOSSIER } from "./dossier.generated";
 
 /**
- * The whole corpus is about 1,900 tokens, every job, project, skill and
+ * The whole corpus is about 2,150 tokens, every job, project, skill and
  * credential on the site. That fits in a system prompt many times over, so
  * there is no retrieval step here and no vector store: the model gets the
  * complete dossier on every request and never has to guess what it can see.

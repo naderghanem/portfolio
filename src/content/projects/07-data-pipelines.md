@@ -1,7 +1,7 @@
 ---
 title: "Data collection pipelines"
 context: "DATABIZ"
-order: 6
+order: 7
 tags: ["Scrapy", "Selenium", "PostgreSQL"]
 ---
 

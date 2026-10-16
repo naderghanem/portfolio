@@ -5,7 +5,7 @@ const projects = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/projects" }),
   schema: z.object({
     title: z.string(),
-    /** Where the work happened — the employer named in Experience, or "This site". */
+    /** Where the work happened — the employer named in Experience, "This site" or "Side project". */
     context: z.string(),
     /** Lower numbers appear first. */
     order: z.number(),

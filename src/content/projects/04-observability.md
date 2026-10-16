@@ -1,7 +1,7 @@
 ---
 title: "Failure visibility for the support team"
 context: "Awaretrain"
-order: 3
+order: 4
 tags: ["Grafana", "Loki", "CloudWatch"]
 ---
 

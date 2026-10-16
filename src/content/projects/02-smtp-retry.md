@@ -1,7 +1,7 @@
 ---
 title: "Retries that know when to give up"
 context: "Awaretrain"
-order: 1
+order: 2
 tags: ["Symfony Messenger", "SMTP", "PHP"]
 ---
 
